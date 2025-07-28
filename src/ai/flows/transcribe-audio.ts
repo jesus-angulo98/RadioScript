@@ -49,18 +49,8 @@ const transcribeAudioFlow = ai.defineFlow(
     outputSchema: TranscribeAudioOutputSchema,
   },
   async input => {
-    try {
-      // First attempt with the primary model
-      const {output} = await transcribePrompt(input, { model: 'googleai/gemini-1.5-flash-latest' });
-      return output!;
-    } catch (e: any) {
-      // If the primary model fails (e.g., is overloaded), try the fallback model.
-      console.log(
-        'Primary model failed, attempting transcription with fallback model.',
-        e
-      );
-      const {output} = await transcribePrompt(input, { model: 'googleai/gemini-1.5-pro-latest' });
-      return output!;
-    }
+    // Using the 'pro' model directly as it's better suited for long audio files.
+    const {output} = await transcribePrompt(input, { model: 'googleai/gemini-1.5-pro-latest' });
+    return output!;
   }
 );
