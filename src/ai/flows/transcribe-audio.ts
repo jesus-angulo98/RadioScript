@@ -10,6 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import {generate} from 'genkit/generate';
 
 const TranscribeAudioInputSchema = z.object({
   audioDataUri: z
@@ -27,16 +28,11 @@ const TranscribeAudioOutputSchema = z.object({
 });
 export type TranscribeAudioOutput = z.infer<typeof TranscribeAudioOutputSchema>;
 
-export async function transcribeAudio(input: TranscribeAudioInput): Promise<TranscribeAudioOutput> {
+export async function transcribeAudio(
+  input: TranscribeAudioInput
+): Promise<TranscribeAudioOutput> {
   return transcribeAudioFlow(input);
 }
-
-const prompt = ai.definePrompt({
-  name: 'transcribeAudioPrompt',
-  input: {schema: TranscribeAudioInputSchema},
-  output: {schema: TranscribeAudioOutputSchema},
-  prompt: `You are an expert medical transcriptionist. Please transcribe the following audio recording of a radiology report into text.\n\nAudio: {{media url=audioDataUri}}`,
-});
 
 const transcribeAudioFlow = ai.defineFlow(
   {
@@ -45,7 +41,37 @@ const transcribeAudioFlow = ai.defineFlow(
     outputSchema: TranscribeAudioOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    const prompt = {
+      prompt: `You are an expert medical transcriptionist. Please transcribe the following audio recording of a radiology report into text.\n\nAudio: {{media url=audioDataUri}}`,
+      input: input,
+    };
+
+    try {
+      // First attempt with the primary model
+      const primaryModel = ai.model('gemini-1.5-flash-latest');
+      const response = await generate({
+        model: primaryModel,
+        ...prompt,
+        output: {
+          schema: TranscribeAudioOutputSchema,
+        },
+      });
+      return response.output!;
+    } catch (e: any) {
+      // If the primary model fails (e.g., is overloaded), try the fallback model.
+      console.log(
+        'Primary model failed, attempting transcription with fallback model.',
+        e
+      );
+      const fallbackModel = ai.model('gemini-1.5-pro-latest');
+      const response = await generate({
+        model: fallbackModel,
+        ...prompt,
+        output: {
+          schema: TranscribeAudioOutputSchema,
+        },
+      });
+      return response.output!;
+    }
   }
 );
