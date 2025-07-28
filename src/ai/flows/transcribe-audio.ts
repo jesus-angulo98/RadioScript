@@ -56,6 +56,8 @@ async function transcribeChunk(input: TranscribeAudioInput): Promise<TranscribeA
   return output!;
 }
 
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 const transcribeAudioFlow = ai.defineFlow(
   {
     name: 'transcribeAudioFlow',
@@ -141,6 +143,11 @@ const transcribeAudioFlow = ai.defineFlow(
         });
         sox.run();
       });
+      // Add a delay between chunks to avoid rate limiting
+      if (i < numChunks - 1) {
+        console.log('Waiting for 2 seconds before next chunk...');
+        await delay(2000);
+      }
     }
 
     await fs.unlink(tempFilePath).catch(console.error);
