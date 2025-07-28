@@ -33,6 +33,15 @@ export async function transcribeAudio(
   return transcribeAudioFlow(input);
 }
 
+const transcribePrompt = ai.definePrompt({
+  name: 'transcribePrompt',
+  input: { schema: TranscribeAudioInputSchema },
+  output: { schema: TranscribeAudioOutputSchema },
+  prompt: `You are an expert medical transcriptionist. Please transcribe the following audio recording of a radiology report into text.
+
+Audio: {{media url=audioDataUri}}`,
+});
+
 const transcribeAudioFlow = ai.defineFlow(
   {
     name: 'transcribeAudioFlow',
@@ -40,35 +49,18 @@ const transcribeAudioFlow = ai.defineFlow(
     outputSchema: TranscribeAudioOutputSchema,
   },
   async input => {
-    const prompt = {
-      prompt: `You are an expert medical transcriptionist. Please transcribe the following audio recording of a radiology report into text.\n\nAudio: {{media url=audioDataUri}}`,
-      input: input,
-    };
-
     try {
       // First attempt with the primary model
-      const response = await ai.generate({
-        model: 'googleai/gemini-1.5-flash-latest',
-        ...prompt,
-        output: {
-          schema: TranscribeAudioOutputSchema,
-        },
-      });
-      return response.output!;
+      const {output} = await transcribePrompt(input, { model: 'googleai/gemini-1.5-flash-latest' });
+      return output!;
     } catch (e: any) {
       // If the primary model fails (e.g., is overloaded), try the fallback model.
       console.log(
         'Primary model failed, attempting transcription with fallback model.',
         e
       );
-      const response = await ai.generate({
-        model: 'googleai/gemini-1.5-pro-latest',
-        ...prompt,
-        output: {
-          schema: TranscribeAudioOutputSchema,
-        },
-      });
-      return response.output!;
+      const {output} = await transcribePrompt(input, { model: 'googleai/gemini-1.5-pro-latest' });
+      return output!;
     }
   }
 );
