@@ -50,23 +50,10 @@ Audio: {{media url=audioDataUri}}`,
 const MAX_DURATION_SECONDS = 180; // 3 minutes
 
 async function transcribeChunk(input: TranscribeAudioInput): Promise<TranscribeAudioOutput> {
-  // Try with flash model first, as it's faster and more cost-effective.
-  try {
-    const {output} = await transcribePrompt(input, {
-      model: 'googleai/gemini-1.5-flash-latest',
-    });
-    return output!;
-  } catch (e) {
-    console.warn(
-      'gemini-1.5-flash-latest failed, retrying with gemini-1.5-pro-latest...',
-      e
-    );
-    // Retry with the pro model as a fallback
-    const {output} = await transcribePrompt(input, {
-      model: 'googleai/gemini-1.5-pro-latest',
-    });
-    return output!;
-  }
+  const {output} = await transcribePrompt(input, {
+    model: 'googleai/gemini-1.5-flash-latest',
+  });
+  return output!;
 }
 
 const transcribeAudioFlow = ai.defineFlow(
