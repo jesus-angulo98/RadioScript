@@ -129,7 +129,7 @@ export default function DashboardPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "radioscript_transcripcion.txt";
+    a.download = "medical_transcription.txt";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -148,7 +148,7 @@ export default function DashboardPage() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <AudioWaveform className="h-7 w-7 text-primary" />
-            <h1 className="text-xl font-bold">RadioScript</h1>
+            <h1 className="text-xl font-bold">Medical Transcribe</h1>
           </div>
           <Button variant="ghost" size="icon" onClick={() => router.push("/")}>
             <LogOut className="h-5 w-5" />
@@ -170,7 +170,7 @@ export default function DashboardPage() {
                 <AlertCircle className="h-4 w-4" />
                 <AlertTitle>¡Aviso Importante!</AlertTitle>
                 <AlertDescription>
-                  RadioScript es una demostración. Los archivos de audio y las transcripciones NO se guardan y se perderán al salir o refrescar la página.
+                  Medical Transcribe es una demostración. Los archivos de audio y las transcripciones NO se guardan y se perderán al salir o refrescar la página.
                 </AlertDescription>
               </Alert>
               <div className="flex items-center space-x-2">
@@ -273,8 +273,8 @@ export default function DashboardPage() {
                        <Button onClick={handleDownload} variant="outline"><Download className="mr-2 h-4 w-4" /> Descargar (.txt)</Button>
                      </div>
                      <Textarea
-                        value={fullTranscriptionText}
                         readOnly
+                        value={fullTranscriptionText}
                         placeholder="Aquí aparecerá el texto transcrito..."
                         className="min-h-[300px] text-base bg-white"
                       />

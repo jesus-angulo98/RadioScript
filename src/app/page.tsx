@@ -30,7 +30,7 @@ export default function LoginPage() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
             <AudioWaveform className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-3xl font-bold text-primary">RadioScript</CardTitle>
+          <CardTitle className="text-3xl font-bold text-primary">Medical Transcribe</CardTitle>
           <CardDescription>
             Inicia sesión para transcribir tus informes de radiología.
           </CardDescription>

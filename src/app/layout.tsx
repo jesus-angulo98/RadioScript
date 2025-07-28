@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 
 export const metadata: Metadata = {
-  title: 'RadioScript',
-  description: 'Transcribe medical radiology audio reports with ease.',
+  title: 'Medical Transcribe',
+  description: 'Transcribe medical audio reports with ease.',
 };
 
 export default function RootLayout({
