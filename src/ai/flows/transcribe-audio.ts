@@ -47,9 +47,8 @@ const transcribeAudioFlow = ai.defineFlow(
 
     try {
       // First attempt with the primary model
-      const primaryModel = ai.model('gemini-1.5-flash-latest');
       const response = await generate({
-        model: primaryModel,
+        model: 'gemini-1.5-flash-latest',
         ...prompt,
         output: {
           schema: TranscribeAudioOutputSchema,
@@ -62,9 +61,8 @@ const transcribeAudioFlow = ai.defineFlow(
         'Primary model failed, attempting transcription with fallback model.',
         e
       );
-      const fallbackModel = ai.model('gemini-1.5-pro-latest');
       const response = await generate({
-        model: fallbackModel,
+        model: 'gemini-1.5-pro-latest',
         ...prompt,
         output: {
           schema: TranscribeAudioOutputSchema,
