@@ -20,7 +20,7 @@ const TranscribeAudioInputSchema = z.object({
   audioDataUri: z
     .string()
     .describe(
-      "An audio recording of a radiology report, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
+      "An audio recording of a radiology report, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'"
     ),
 });
 export type TranscribeAudioInput = z.infer<typeof TranscribeAudioInputSchema>;
@@ -50,13 +50,14 @@ Audio: {{media url=audioDataUri}}`,
 const MAX_DURATION_SECONDS = 180; // 3 minutes
 
 async function transcribeChunk(input: TranscribeAudioInput): Promise<TranscribeAudioOutput> {
+  // Try with flash model first, as it's faster and more cost-effective.
   try {
     const {output} = await transcribePrompt(input, {
       model: 'googleai/gemini-1.5-flash-latest',
     });
     return output!;
   } catch (e) {
-     console.warn(
+    console.warn(
       'gemini-1.5-flash-latest failed, retrying with gemini-1.5-pro-latest...',
       e
     );
