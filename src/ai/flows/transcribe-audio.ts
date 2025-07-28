@@ -36,7 +36,6 @@ const prompt = ai.definePrompt({
   input: {schema: TranscribeAudioInputSchema},
   output: {schema: TranscribeAudioOutputSchema},
   prompt: `You are an expert medical transcriptionist. Please transcribe the following audio recording of a radiology report into text.\n\nAudio: {{media url=audioDataUri}}`,
-  model: 'googleai/gemini-1.5-pro'
 });
 
 const transcribeAudioFlow = ai.defineFlow(
