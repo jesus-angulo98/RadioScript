@@ -50,18 +50,21 @@ Audio: {{media url=audioDataUri}}`,
 const MAX_DURATION_SECONDS = 180; // 3 minutes
 
 async function transcribeChunk(input: TranscribeAudioInput): Promise<TranscribeAudioOutput> {
+  // We will only use gemini-1.5-flash-latest as it has a more generous free tier.
+  // The 'pro' model was hitting quota limits.
   try {
     const {output} = await transcribePrompt(input, {
       model: 'googleai/gemini-1.5-flash-latest',
     });
     return output!;
   } catch (e) {
-    console.warn(
-      'gemini-1.5-flash-latest failed, retrying with gemini-1.5-pro-latest...',
+     console.warn(
+      'gemini-1.5-flash-latest failed, retrying with gemini-1.5-flash-latest...',
       e
     );
+    // Retry with the same model, as the issue is likely temporary overload, not a model capability issue.
     const {output} = await transcribePrompt(input, {
-      model: 'googleai/gemini-1.5-pro-latest',
+      model: 'googleai/gemini-1.5-flash-latest',
     });
     return output!;
   }
@@ -119,7 +122,9 @@ const transcribeAudioFlow = ai.defineFlow(
     const transcribedChunks: string[] = [];
     const numChunks = Math.ceil(duration / MAX_DURATION_SECONDS);
 
+    // Process chunks sequentially to avoid rate limiting
     for (let i = 0; i < numChunks; i++) {
+       console.log(`Processing chunk ${i + 1} of ${numChunks}...`);
       const startTime = i * MAX_DURATION_SECONDS;
       const chunkPath = path.join(
         tempDir,
