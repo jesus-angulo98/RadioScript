@@ -50,8 +50,6 @@ Audio: {{media url=audioDataUri}}`,
 const MAX_DURATION_SECONDS = 180; // 3 minutes
 
 async function transcribeChunk(input: TranscribeAudioInput): Promise<TranscribeAudioOutput> {
-  // We will only use gemini-1.5-flash-latest as it has a more generous free tier.
-  // The 'pro' model was hitting quota limits.
   try {
     const {output} = await transcribePrompt(input, {
       model: 'googleai/gemini-1.5-flash-latest',
@@ -59,12 +57,12 @@ async function transcribeChunk(input: TranscribeAudioInput): Promise<TranscribeA
     return output!;
   } catch (e) {
      console.warn(
-      'gemini-1.5-flash-latest failed, retrying with gemini-1.5-flash-latest...',
+      'gemini-1.5-flash-latest failed, retrying with gemini-1.5-pro-latest...',
       e
     );
-    // Retry with the same model, as the issue is likely temporary overload, not a model capability issue.
+    // Retry with the pro model as a fallback
     const {output} = await transcribePrompt(input, {
-      model: 'googleai/gemini-1.5-flash-latest',
+      model: 'googleai/gemini-1.5-pro-latest',
     });
     return output!;
   }
