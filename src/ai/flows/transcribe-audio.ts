@@ -9,8 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
-import {generate} from 'genkit/generate';
+import {z, generate} from 'genkit';
 
 const TranscribeAudioInputSchema = z.object({
   audioDataUri: z
