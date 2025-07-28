@@ -9,7 +9,7 @@
  */
 
 import {ai} from '@/ai/genkit';
-import {z, generate} from 'genkit';
+import {z} from 'genkit';
 
 const TranscribeAudioInputSchema = z.object({
   audioDataUri: z
@@ -47,7 +47,7 @@ const transcribeAudioFlow = ai.defineFlow(
 
     try {
       // First attempt with the primary model
-      const response = await generate({
+      const response = await ai.generate({
         model: 'gemini-1.5-flash-latest',
         ...prompt,
         output: {
@@ -61,7 +61,7 @@ const transcribeAudioFlow = ai.defineFlow(
         'Primary model failed, attempting transcription with fallback model.',
         e
       );
-      const response = await generate({
+      const response = await ai.generate({
         model: 'gemini-1.5-pro-latest',
         ...prompt,
         output: {
