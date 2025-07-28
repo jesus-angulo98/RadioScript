@@ -116,7 +116,7 @@ const transcribeAudioFlow = ai.defineFlow(
 
     // Audio is long, chunk it
     console.log(`Audio is long (${duration}s), chunking...`);
-    const chunkPromises: Promise<string>[] = [];
+    const transcribedChunks: string[] = [];
     const numChunks = Math.ceil(duration / MAX_DURATION_SECONDS);
 
     for (let i = 0; i < numChunks; i++) {
@@ -132,7 +132,7 @@ const transcribeAudioFlow = ai.defineFlow(
       sox.outputFileType(fileExtension);
       sox.trim(startTime, MAX_DURATION_SECONDS);
 
-      const chunkPromise = new Promise<string>((resolve, reject) => {
+      await new Promise<void>((resolve, reject) => {
         sox.on('error', reject);
         sox.on('end', async () => {
           try {
@@ -141,18 +141,17 @@ const transcribeAudioFlow = ai.defineFlow(
               'base64'
             )}`;
             const result = await transcribeChunk({audioDataUri: chunkDataUri});
+            transcribedChunks.push(result.transcribedText);
             await fs.unlink(chunkPath).catch(console.error);
-            resolve(result.transcribedText);
+            resolve();
           } catch (e) {
             reject(e);
           }
         });
         sox.run();
       });
-      chunkPromises.push(chunkPromise);
     }
 
-    const transcribedChunks = await Promise.all(chunkPromises);
     await fs.unlink(tempFilePath).catch(console.error);
     
     return {
