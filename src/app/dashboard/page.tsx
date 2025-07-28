@@ -253,7 +253,7 @@ export default function DashboardPage() {
                      </div>
                      <Textarea
                         value={fullTranscriptionText}
-                        readOnly={false}
+                        readOnly
                         placeholder="Aquí aparecerá el texto transcrito..."
                         className="min-h-[300px] text-base bg-white"
                       />
