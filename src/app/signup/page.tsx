@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { AudioWaveform, Lock, Mail } from "lucide-react";
+import { AudioWaveform, Lock, Mail, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,11 +15,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
+    // In a real app, you'd handle signup logic here.
+    // For this demo, we'll just redirect to the dashboard.
     router.push("/dashboard");
   };
 
@@ -32,14 +34,21 @@ export default function LoginPage() {
           </div>
           <CardTitle className="text-3xl font-bold text-primary">RadioScript</CardTitle>
           <CardDescription>
-            Inicia sesión para transcribir tus informes de radiología.
+            Crea tu cuenta para empezar a transcribir.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+          <form onSubmit={handleSignup} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Nombre Completo</Label>
+               <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                <Input id="name" type="text" placeholder="Dr. Juan Pérez" required className="pl-10" />
+              </div>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Correo Electrónico</Label>
-              <div className="relative">
+               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                 <Input
                   id="email"
@@ -58,18 +67,18 @@ export default function LoginPage() {
               </div>
             </div>
             <Button type="submit" className="w-full text-lg">
-              Iniciar Sesión
+              Crear Cuenta
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center">
           <p className="text-sm text-muted-foreground">
-            ¿No tienes una cuenta?{" "}
+            ¿Ya tienes una cuenta?{" "}
             <Link
-              href="/signup"
+              href="/"
               className="font-medium text-primary hover:underline"
             >
-              Regístrate
+              Inicia Sesión
             </Link>
           </p>
         </CardFooter>
