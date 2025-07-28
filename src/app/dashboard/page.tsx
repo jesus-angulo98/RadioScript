@@ -62,6 +62,26 @@ export default function DashboardPage() {
       reader.readAsDataURL(file);
     });
 
+  const playCompletionSound = () => {
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); // Low volume
+      
+      oscillator.start();
+      oscillator.stop(audioContext.currentTime + 0.2); // Short beep
+    } catch (e) {
+      console.error("Could not play sound:", e);
+    }
+  };
+
   const handleTranscribe = async () => {
     if (files.length === 0 || !isDisclaimerChecked) return;
     setIsLoading(true);
@@ -75,6 +95,7 @@ export default function DashboardPage() {
         results.push({ fileName: file.name, text: result.transcribedText });
       }
       setTranscriptions(results);
+      playCompletionSound();
     } catch (error) {
       console.error("Transcription error:", error);
       toast({
