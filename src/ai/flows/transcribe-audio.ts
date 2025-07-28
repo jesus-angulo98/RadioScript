@@ -92,7 +92,7 @@ const transcribeAudioFlow = ai.defineFlow(
     if (duration <= MAX_DURATION_SECONDS) {
       // Audio is short, transcribe directly
       const {output} = await transcribePrompt(input, {
-        model: 'googleai/gemini-1.5-pro-latest',
+        model: 'googleai/gemini-1.5-flash-latest',
       });
       await fs.unlink(tempFilePath).catch(console.error);
       return output!;
@@ -126,7 +126,7 @@ const transcribeAudioFlow = ai.defineFlow(
             )}`;
             const {output} = await transcribePrompt(
               {audioDataUri: chunkDataUri},
-              {model: 'googleai/gemini-1.5-pro-latest'}
+              {model: 'googleai/gemini-1.5-flash-latest'}
             );
             await fs.unlink(chunkPath).catch(console.error);
             resolve(output!.transcribedText);
