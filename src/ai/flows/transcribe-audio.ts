@@ -48,7 +48,7 @@ const transcribeAudioFlow = ai.defineFlow(
     try {
       // First attempt with the primary model
       const response = await ai.generate({
-        model: 'gemini-1.5-flash-latest',
+        model: 'googleai/gemini-1.5-flash-latest',
         ...prompt,
         output: {
           schema: TranscribeAudioOutputSchema,
@@ -62,7 +62,7 @@ const transcribeAudioFlow = ai.defineFlow(
         e
       );
       const response = await ai.generate({
-        model: 'gemini-1.5-pro-latest',
+        model: 'googleai/gemini-1.5-pro-latest',
         ...prompt,
         output: {
           schema: TranscribeAudioOutputSchema,
