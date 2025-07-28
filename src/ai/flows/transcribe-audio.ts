@@ -49,6 +49,24 @@ Audio: {{media url=audioDataUri}}`,
 
 const MAX_DURATION_SECONDS = 180; // 3 minutes
 
+async function transcribeChunk(input: TranscribeAudioInput): Promise<TranscribeAudioOutput> {
+  try {
+    const {output} = await transcribePrompt(input, {
+      model: 'googleai/gemini-1.5-flash-latest',
+    });
+    return output!;
+  } catch (e) {
+    console.warn(
+      'gemini-1.5-flash-latest failed, retrying with gemini-1.5-pro-latest...',
+      e
+    );
+    const {output} = await transcribePrompt(input, {
+      model: 'googleai/gemini-1.5-pro-latest',
+    });
+    return output!;
+  }
+}
+
 const transcribeAudioFlow = ai.defineFlow(
   {
     name: 'transcribeAudioFlow',
@@ -91,11 +109,9 @@ const transcribeAudioFlow = ai.defineFlow(
 
     if (duration <= MAX_DURATION_SECONDS) {
       // Audio is short, transcribe directly
-      const {output} = await transcribePrompt(input, {
-        model: 'googleai/gemini-1.5-flash-latest',
-      });
+      const result = await transcribeChunk(input);
       await fs.unlink(tempFilePath).catch(console.error);
-      return output!;
+      return result;
     }
 
     // Audio is long, chunk it
@@ -109,13 +125,13 @@ const transcribeAudioFlow = ai.defineFlow(
         tempDir,
         `${uuidv4()}-chunk-${i}.${fileExtension}`
       );
-
+      
       const sox = new Sox();
       sox.input(tempFilePath);
       sox.output(chunkPath);
       sox.outputFileType(fileExtension);
       sox.trim(startTime, MAX_DURATION_SECONDS);
-      
+
       const chunkPromise = new Promise<string>((resolve, reject) => {
         sox.on('error', reject);
         sox.on('end', async () => {
@@ -124,12 +140,9 @@ const transcribeAudioFlow = ai.defineFlow(
             const chunkDataUri = `data:${mimeType};base64,${chunkData.toString(
               'base64'
             )}`;
-            const {output} = await transcribePrompt(
-              {audioDataUri: chunkDataUri},
-              {model: 'googleai/gemini-1.5-flash-latest'}
-            );
+            const result = await transcribeChunk({audioDataUri: chunkDataUri});
             await fs.unlink(chunkPath).catch(console.error);
-            resolve(output!.transcribedText);
+            resolve(result.transcribedText);
           } catch (e) {
             reject(e);
           }
