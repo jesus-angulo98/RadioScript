@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo, useCallback, useRef, type DragEvent } from "react";
@@ -65,18 +66,28 @@ export default function DashboardPage() {
   const playCompletionSound = () => {
     try {
       const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
+      const playTone = (freq: number, startTime: number, duration: number) => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.type = 'triangle';
+        oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+
+        const now = audioContext.currentTime;
+        gainNode.gain.setValueAtTime(0, now);
+        gainNode.gain.linearRampToValueAtTime(0.3, now + startTime); // Fade in
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, now + startTime + duration); // Fade out
+
+        oscillator.start(now + startTime);
+        oscillator.stop(now + startTime + duration);
+      };
       
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
+      playTone(880, 0, 0.15); // First tone (A5)
+      playTone(1046.50, 0.1, 0.2); // Second tone (C6)
       
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-      gainNode.gain.setValueAtTime(0.1, audioContext.currentTime); // Low volume
-      
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.2); // Short beep
     } catch (e) {
       console.error("Could not play sound:", e);
     }
